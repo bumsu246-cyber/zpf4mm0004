@@ -1,0 +1,371 @@
+<mvc:View
+    controllerName="ncode.zpf4mm0004.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form">
+
+    <Page
+        id="page"
+        title="물류 이동 요청 (STO) 생성"
+        showHeader="true">
+
+        <content>
+            <VBox class="sapUiMediumMargin">
+
+                <!-- 1. 자재 / 재고 조회 -->
+                <Panel
+                    headerText="1. 자재/재고 조회"
+                    class="sapUiNoContentPadding sapUiSmallMarginBottom">
+
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+
+                            <HBox
+                                alignItems="End"
+                                justifyContent="SpaceBetween">
+
+                                <VBox width="28%">
+                                    <Label text="자재번호" />
+                                    <Input
+                                        id="inpMatnr"
+                                        placeholder="자재번호 입력"
+                                        showValueHelp="true"
+                                        valueHelpRequest=".onValueHelpMatnr" />
+                                </VBox>
+
+                                <VBox width="22%">
+                                    <Label text="Plant(받는)" />
+                                    <Select id="selToWerks" width="100%" items="{/esInfoSet}">
+                                        	<core:ListItem key="{Werks}" text="{Werks}" />
+                                    </Select>
+                                </VBox>
+
+                                <VBox width="22%">
+                                    <Label text="보관 장소(받는)" />
+                                    <Select id="selToLgort" width="100%" items="{/esInfoSet}">
+                                        <core:ListItem key="{Lgort}" text="{Lgort}" />
+                                    </Select>
+                                </VBox>
+
+                                <HBox>
+                                    <Button
+                                        text="조회"
+                                        type="Emphasized"
+                                        width="6rem"
+                                        press=".onSearchStock" />
+
+                                    <Button
+                                        text="초기화"
+                                        type="Transparent"
+                                        class="sapUiTinyMarginBegin"
+                                        press=".onResetSearch" />
+                                </HBox>
+
+                            </HBox>
+
+                        </VBox>
+                    </content>
+                </Panel>
+
+
+                <!-- 재고 목록 + 선택 자재 정보 -->
+                <Panel
+                    headerText="재고 목록"
+                    class="sapUiNoContentPadding sapUiSmallMarginBottom">
+
+                    <content>
+                        <HBox class="sapUiMediumMargin" alignItems="Start">
+
+                            <!-- 재고 테이블 -->
+                            <VBox width="73%">
+                                <Table
+                                    id="stockTable"
+                                    mode="SingleSelectLeft"
+                                    selectionChange=".onStockSelect"
+                                    items="{/esInfoSet}"
+                                    >
+
+                                    <columns>
+                                        <Column width="8rem">
+                                            <Text text="자재번호" />
+                                        </Column>
+                                        <Column>
+                                            <Text text="자재명" />
+                                        </Column>
+                                        <Column width="8rem">
+                                            <Text text="플랜트" />
+                                        </Column>
+                                        <Column width="9rem">
+                                            <Text text="보관장소" />
+                                        </Column>
+                                        <Column width="8rem" hAlign="End">
+                                            <Text text="가용 재고" />
+                                        </Column>
+                                        <Column width="5rem">
+                                            <Text text="단위" />
+                                        </Column>
+                                    </columns>
+
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Text text="{Matnr}" />
+                                                <Text text="{Maktx}" />
+                                                <Text text="{Werks}" />
+                                                <Text text="{Lgort}" />
+                                                <Text text="{Labst}" />
+                                                <Text text="{Meins}" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </VBox>
+
+                            <!-- 선택한 자재 정보 -->
+                            <VBox
+                                width="25%"
+                                class="sapUiMediumMarginBegin selectedInfoBox">
+
+                                <Title text="선택한 자재 정보" level="H4" />
+
+                                <f:SimpleForm
+                                    editable="false"
+                                    layout="ResponsiveGridLayout"
+                                    labelSpanXL="5"
+                                    labelSpanL="5"
+                                    labelSpanM="5"
+                                    labelSpanS="12"
+                                    adjustLabelSpan="false"
+                                    emptySpanXL="0"
+                                    emptySpanL="0"
+                                    emptySpanM="0"
+                                    columnsXL="1"
+                                    columnsL="1"
+                                    columnsM="1">
+
+                                    <f:content>
+                                        <Label text="자재번호" />
+                                        <Text id="txtSelMatnr" text="-" />
+
+                                        <Label text="자재명" />
+                                        <Text id="txtSelMaktx" text="-" />
+
+                                        <Label text="받는 Plant" />
+                                        <Text id="txtSelToWerks" text="-" />
+
+                                        <Label text="받는 보관장소" />
+                                        <Text id="txtSelToLgort" text="-" />
+
+                                        <Label text="가용 재고" />
+                                        <Text id="txtSelLabst" text="-" />
+                                    </f:content>
+                                </f:SimpleForm>
+
+                            </VBox>
+
+                        </HBox>
+                    </content>
+                </Panel>
+
+
+                <!-- 2. 이동 요청 항목 -->
+                <Panel
+                    headerText="2. 이동 요청 항목"
+                    class="sapUiNoContentPadding sapUiSmallMarginBottom">
+
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+
+                            <Toolbar>
+                                <ToolbarSpacer />
+                                <Button
+                                    text="항목 추가"
+                                    icon="sap-icon://add"
+                                    type="Emphasized"
+                                    press=".onAddItem" />
+                                <Button
+                                    text="항목 삭제"
+                                    icon="sap-icon://delete"
+                                    press=".onDeleteItem" />
+                                <Button
+                                    text="전체 삭제"
+                                    icon="sap-icon://delete"
+                                    press=".onDeleteAllItems" />
+                            </Toolbar>
+
+                            <Table
+                                id="requestItemTable"
+                                mode="SingleSelectLeft"
+                                items="{/RequestItemSet}">
+
+                                <columns>
+                                    <Column width="4rem" hAlign="Center">
+                                        <Text text="No." />
+                                    </Column>
+                                    <Column width="9rem">
+                                        <Text text="자재번호" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="자재명" />
+                                    </Column>
+                                    <Column width="9rem">
+                                        <Text text="보내는 Plant" />
+                                    </Column>
+                                    <Column width="10rem">
+                                        <Text text="보내는 보관장소" />
+                                    </Column>
+                                    <Column width="9rem">
+                                        <Text text="받는 Plant" />
+                                    </Column>
+                                    <Column width="10rem">
+                                        <Text text="받는 보관장소" />
+                                    </Column>
+                                    <Column width="9rem" hAlign="End">
+                                        <Text text="이동 수량" />
+                                    </Column>
+                                    <Column width="5rem">
+                                        <Text text="단위" />
+                                    </Column>
+                                    <Column width="9rem">
+                                        <Text text="비고" />
+                                    </Column>
+                                    <Column width="4rem" hAlign="Center">
+                                        <Text text="" />
+                                    </Column>
+                                </columns>
+
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
+                                            <Text text="{No}" />
+
+                                            <Input
+                                                value="{Matnr}"
+                                                showValueHelp="true"
+                                                valueHelpRequest=".onValueHelpMatnr" />
+
+                                            <Text text="{Maktx}" />
+
+                                            <Select selectedKey="{Swerks}">
+                                                <core:Item key="1000" text="1000" />
+                                                <core:Item key="2000" text="2000" />
+                                                <core:Item key="4000" text="4000" />
+                                            </Select>
+
+                                            <Input
+                                                value="{Slgort}"
+                                                showValueHelp="true"
+                                                valueHelpRequest=".onValueHelpSlgort" />
+
+                                            <Input
+                                                value="{Werks}"
+                                                editable="false" />
+
+                                            <Input
+                                                value="{Lgort}"
+                                                editable="false" />
+
+                                            <Input
+                                                value="{Menge}"
+                                                textAlign="End"
+                                                type="Number" />
+
+                                            <Input
+                                                value="{Meins}"
+                                                editable="false" />
+
+                                            <Input
+                                                value="{Bktxt}"
+                                                placeholder="비고" />
+
+                                            <Button
+                                                icon="sap-icon://delete"
+                                                type="Transparent"
+                                                press=".onDeleteItemRow" />
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+
+                            <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginTop">
+                                <Text text="총 0 건" id="txtItemCount" />
+                                <ObjectNumber
+                                    id="txtTotalQty"
+                                    number="0"
+                                    unit="EA"
+                                    emphasized="true" />
+                            </HBox>
+
+                        </VBox>
+                    </content>
+                </Panel>
+
+
+                <!-- 3. STO 정보 -->
+                <Panel
+                    headerText="3. STO 정보"
+                    class="sapUiNoContentPadding">
+
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+
+                            <HBox
+                                alignItems="End"
+                                justifyContent="SpaceBetween">
+
+                                <VBox width="15%">
+                                    <Label text="문서 유형" />
+                                    <Select id="selBsart" width="100%">
+                                        <core:Item key="S" text="S - STO" />
+                                    </Select>
+                                </VBox>
+
+                                <VBox width="22%">
+                                    <Label text="비고" />
+                                    <Input
+                                        id="inpHeaderText"
+                                        value="물류 이동 요청" />
+                                </VBox>
+
+                                <VBox width="15%">
+                                    <Label text="요청일" />
+                                    <DatePicker
+                                        id="dpReqDate"
+                                        valueFormat="yyyyMMdd"
+                                        displayFormat="yyyy.MM.dd" />
+                                </VBox>
+
+                                <ToolbarSpacer />
+
+                                <HBox>
+                                    <Button
+                                        text="초기화"
+                                        width="7rem"
+                                        press=".onResetAll" />
+
+                                    <Button
+                                        text="저장"
+                                        type="Emphasized"
+                                        width="8rem"
+                                        class="sapUiSmallMarginBegin"
+                                        press=".onSaveDraft" />
+
+                                    <Button
+                                        text="STO 생성"
+                                        type="Accept"
+                                        width="9rem"
+                                        class="sapUiSmallMarginBegin"
+                                        press=".onCreateSto" />
+                                </HBox>
+
+                            </HBox>
+
+                        </VBox>
+                    </content>
+                </Panel>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

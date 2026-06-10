@@ -36,15 +36,24 @@
 
                                 <VBox width="22%">
                                     <Label text="Plant(받는)" />
-                                    <Select id="selToWerks" width="100%" items="{/esInfoSet}">
-                                        	<core:ListItem key="{Werks}" text="{Werks}" />
+                                    <Select
+                                        id="selToWerks"
+                                        width="100%"
+                                        selectedKey="{search>/selectedWerks}"
+                                        items="{search>/plants}"
+                                        change=".onToWerksChange">
+                                        <core:Item key="{search>key}" text="{search>text}" />
                                     </Select>
                                 </VBox>
 
                                 <VBox width="22%">
                                     <Label text="보관 장소(받는)" />
-                                    <Select id="selToLgort" width="100%" items="{/esInfoSet}">
-                                        <core:ListItem key="{Lgort}" text="{Lgort}" />
+                                    <Select
+                                        id="selToLgort"
+                                        width="100%"
+                                        selectedKey="{search>/selectedLgort}"
+                                        items="{search>/storageLocations}">
+                                        <core:Item key="{search>key}" text="{search>text}" />
                                     </Select>
                                 </VBox>
 

@@ -47,7 +47,7 @@
                                     </Select>
                                 </VBox>
 
-                                <VBox width="22%">
+                                <VBox width="22%" visible="{= ${search>/selectedWerks} === '4000' }">
                                     <Label text="보관 장소(받는)" />
                                     <Select
                                         id="selToLgort"

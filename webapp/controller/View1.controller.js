@@ -47,11 +47,8 @@ sap.ui.define([
                 return;
             }
 
-            let sLgort = this._getFixedLgort(sWerks, sMatnr);
-            oSearchModel.setProperty("/storageLocations", sLgort ? [
-                { key: sLgort, text: sLgort }
-            ] : []);
-            oSearchModel.setProperty("/selectedLgort", sLgort);
+            oSearchModel.setProperty("/storageLocations", []);
+            oSearchModel.setProperty("/selectedLgort", this._getFixedLgort(sWerks, sMatnr));
         },
 
         _getFixedLgort: function (sWerks, sMatnr) {
@@ -112,14 +109,9 @@ sap.ui.define([
             this._updateStorageLocations();
 
             let sWerks = this.byId("selToWerks").getSelectedKey();
-            let sLgort = this.byId("selToLgort").getSelectedKey();
 
-            if (sWerks) {
-                aFilter.push(new Filter("Werks", FilterOperator.EQ, sWerks));
-            }
-
-            if (sLgort) {
-                aFilter.push(new Filter("Lgort", FilterOperator.EQ, sLgort));
+            if (sWerks && sWerks !== "4000") {
+                aFilter.push(new Filter("Werks", FilterOperator.NE, sWerks));
             }
 
             oBinding.filter(aFilter);

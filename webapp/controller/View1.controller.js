@@ -2,8 +2,9 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], (Controller, JSONModel, Filter, FilterOperator) => {
+    "sap/ui/model/FilterOperator",
+    "sap/m/MessageToast"
+], (Controller, JSONModel, Filter, FilterOperator, MessageToast) => {
     "use strict";
 
     return Controller.extend("ncode.zpf4mm0004.controller.View1", {
@@ -19,6 +20,10 @@ sap.ui.define([
                 ],
                 storageLocations: []
             }), "search");
+
+            this.getView().setModel(new JSONModel({
+                items: []
+            }), "request");
         },
 
         onMatnrChange: function () {
@@ -115,6 +120,89 @@ sap.ui.define([
             }
 
             oBinding.filter(aFilter);
+        },
+
+        onAddItem: function () {
+            let oStockTable = this.byId("stockTable");
+            let aSelectedContexts = oStockTable.getSelectedContexts();
+
+            if (!aSelectedContexts.length) {
+                MessageToast.show("추가할 재고 항목을 선택하세요.");
+                return;
+            }
+
+            this._updateStorageLocations();
+
+            let oRequestModel = this.getView().getModel("request");
+            let aItems = oRequestModel.getProperty("/items").slice();
+            let sWerks = this.byId("selToWerks").getSelectedKey();
+            let sLgort = this.byId("selToLgort").getSelectedKey() || this.getView().getModel("search").getProperty("/selectedLgort");
+
+            aSelectedContexts.forEach((oContext) => {
+                aItems.push(this._createRequestItem(oContext.getObject(), sWerks, sLgort));
+            });
+
+            this._setRequestItems(aItems);
+            oStockTable.removeSelections(true);
+        },
+
+        _createRequestItem: function (oStock, sWerks, sLgort) {
+            return {
+                No: 0,
+                Matnr: oStock.Matnr,
+                Maktx: oStock.Maktx,
+                Swerks: oStock.Werks,
+                Slgort: oStock.Lgort,
+                Werks: sWerks,
+                Lgort: sLgort,
+                Menge: "",
+                Meins: oStock.Meins,
+                Bktxt: ""
+            };
+        },
+
+        onDeleteItem: function () {
+            let oRequestTable = this.byId("requestItemTable");
+            let oSelectedItem = oRequestTable.getSelectedItem();
+
+            if (!oSelectedItem) {
+                MessageToast.show("삭제할 이동요청 항목을 선택하세요.");
+                return;
+            }
+
+            this._deleteRequestItem(oSelectedItem.getBindingContext("request").getPath());
+        },
+
+        onDeleteItemRow: function (oEvent) {
+            this._deleteRequestItem(oEvent.getSource().getBindingContext("request").getPath());
+        },
+
+        _deleteRequestItem: function (sPath) {
+            let iIndex = Number(sPath.split("/").pop());
+            let aItems = this.getView().getModel("request").getProperty("/items").slice();
+
+            aItems.splice(iIndex, 1);
+            this._setRequestItems(aItems);
+        },
+
+        onDeleteAllItems: function () {
+            this._setRequestItems([]);
+        },
+
+        _setRequestItems: function (aItems) {
+            aItems.forEach((oItem, iIndex) => {
+                oItem.No = iIndex + 1;
+            });
+
+            this.getView().getModel("request").setProperty("/items", aItems);
+            this._updateRequestSummary(aItems);
+        },
+
+        _updateRequestSummary: function (aItems) {
+            let iTotalQty = aItems.reduce((iSum, oItem) => iSum + (Number(oItem.Menge) || 0), 0);
+
+            this.byId("txtItemCount").setText("총 " + aItems.length + " 건");
+            this.byId("txtTotalQty").setNumber(iTotalQty);
         }
     });
 });

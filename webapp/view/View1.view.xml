@@ -88,11 +88,10 @@
                         <HBox class="sapUiMediumMargin" alignItems="Start">
 
                             <!-- 재고 테이블 -->
-                            <VBox width="73%">
+                            <VBox width="100%">
                                 <Table
                                     id="stockTable"
-                                    mode="SingleSelectLeft"
-                                    selectionChange=".onStockSelect"
+                                    mode="MultiSelect"
                                     items="{/esInfoSet}"
                                     growing="true"
                                     growingThreshold="5"
@@ -137,7 +136,8 @@
                             <!-- 선택한 자재 정보 -->
                             <VBox
                                 width="25%"
-                                class="sapUiMediumMarginBegin selectedInfoBox">
+                                class="sapUiMediumMarginBegin selectedInfoBox"
+                                visible="false">
 
                                 <Title text="선택한 자재 정보" level="H4" />
 
@@ -209,7 +209,7 @@
                             <Table
                                 id="requestItemTable"
                                 mode="SingleSelectLeft"
-                                items="{/RequestItemSet}">
+                                items="{request>/items}">
 
                                 <columns>
                                     <Column width="4rem" hAlign="Center">
@@ -250,45 +250,46 @@
                                 <items>
                                     <ColumnListItem>
                                         <cells>
-                                            <Text text="{No}" />
+                                            <Text text="{request>No}" />
 
                                             <Input
-                                                value="{Matnr}"
+                                                value="{request>Matnr}"
                                                 showValueHelp="true"
                                                 valueHelpRequest=".onValueHelpMatnr" />
 
-                                            <Text text="{Maktx}" />
+                                            <Text text="{request>Maktx}" />
 
-                                            <Select selectedKey="{Swerks}">
+                                            <Select selectedKey="{request>Swerks}">
                                                 <core:Item key="1000" text="1000" />
                                                 <core:Item key="2000" text="2000" />
+                                                <core:Item key="3000" text="3000" />
                                                 <core:Item key="4000" text="4000" />
                                             </Select>
 
                                             <Input
-                                                value="{Slgort}"
+                                                value="{request>Slgort}"
                                                 showValueHelp="true"
                                                 valueHelpRequest=".onValueHelpSlgort" />
 
                                             <Input
-                                                value="{Werks}"
+                                                value="{request>Werks}"
                                                 editable="false" />
 
                                             <Input
-                                                value="{Lgort}"
+                                                value="{request>Lgort}"
                                                 editable="false" />
 
                                             <Input
-                                                value="{Menge}"
+                                                value="{request>Menge}"
                                                 textAlign="End"
                                                 type="Number" />
 
                                             <Input
-                                                value="{Meins}"
+                                                value="{request>Meins}"
                                                 editable="false" />
 
                                             <Input
-                                                value="{Bktxt}"
+                                                value="{request>Bktxt}"
                                                 placeholder="비고" />
 
                                             <Button

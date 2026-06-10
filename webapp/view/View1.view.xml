@@ -84,7 +84,9 @@
                                     mode="SingleSelectLeft"
                                     selectionChange=".onStockSelect"
                                     items="{/esInfoSet}"
-                                    >
+                                    growing="true"
+                                    growingThreshold="5"
+                                    growingScrollToLoad="false">
 
                                     <columns>
                                         <Column width="8rem">

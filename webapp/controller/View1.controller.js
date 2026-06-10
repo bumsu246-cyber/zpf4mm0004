@@ -26,6 +26,14 @@ sap.ui.define([
             }), "request");
         },
 
+        onAfterRendering: function () {
+            if (this._bInitialStockFilterApplied) {
+                return;
+            }
+
+            this._bInitialStockFilterApplied = this.onSearchStock() !== false;
+        },
+
         onMatnrChange: function () {
             this._updateStorageLocations();
         },
@@ -102,24 +110,25 @@ sap.ui.define([
             let oTableStock = this.byId("stockTable");
             let oBinding = oTableStock.getBinding("items");
 
-            // 자재번호 검색
-            let oInputMatnr = this.byId("inpMatnr");
-            let InputMatnr = oInputMatnr.getValue().trim().toUpperCase();
-            let aFilter = [];
-
-            if (InputMatnr) {
-                aFilter.push(new Filter("Matnr", FilterOperator.EQ, InputMatnr));
+            if (!oBinding) {
+                return false;
             }
 
-            this._updateStorageLocations();
-
+            let sMatnr = this.byId("inpMatnr").getValue().trim().toUpperCase();
             let sWerks = this.byId("selToWerks").getSelectedKey();
+            let aFilter = [];
+
+            if (sMatnr) {
+                aFilter.push(new Filter("Matnr", FilterOperator.EQ, sMatnr));
+            }
 
             if (sWerks && sWerks !== "4000") {
                 aFilter.push(new Filter("Werks", FilterOperator.NE, sWerks));
             }
 
+            this._updateStorageLocations();
             oBinding.filter(aFilter);
+            return true;
         },
 
         onAddItem: function () {
@@ -131,15 +140,15 @@ sap.ui.define([
                 return;
             }
 
-            this._updateStorageLocations();
-
             let oRequestModel = this.getView().getModel("request");
             let aItems = oRequestModel.getProperty("/items").slice();
             let sWerks = this.byId("selToWerks").getSelectedKey();
-            let sLgort = this.byId("selToLgort").getSelectedKey() || this.getView().getModel("search").getProperty("/selectedLgort");
+            let sSelectedLgort = this.byId("selToLgort").getSelectedKey() || this.getView().getModel("search").getProperty("/selectedLgort");
 
             aSelectedContexts.forEach((oContext) => {
-                aItems.push(this._createRequestItem(oContext.getObject(), sWerks, sLgort));
+                let oStock = oContext.getObject();
+                let sLgort = sWerks === "4000" ? sSelectedLgort : this._getFixedLgort(sWerks, oStock.Matnr);
+                aItems.push(this._createRequestItem(oStock, sWerks, sLgort));
             });
 
             this._setRequestItems(aItems);

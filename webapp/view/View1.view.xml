@@ -94,7 +94,7 @@
                                     mode="MultiSelect"
                                     items="{/esInfoSet}"
                                     growing="true"
-                                    growingThreshold="5"
+                                    growingThreshold="7"
                                     growingScrollToLoad="false">
 
                                     <columns>

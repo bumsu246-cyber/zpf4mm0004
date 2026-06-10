@@ -31,6 +31,7 @@
                                         id="inpMatnr"
                                         placeholder="자재번호 입력"
                                         showValueHelp="true"
+                                        change=".onMatnrChange"
                                         valueHelpRequest=".onValueHelpMatnr" />
                                 </VBox>
 
